@@ -1,21 +1,32 @@
 #!/usr/bin/env python3
-"""The Dog Ate My Homework: Funniest Excuse.
+"""Dog Ate My Homework — the funniest excuse, one line only.
 
-A dog, caught red-pawed, explains why the homework got eaten.
-The program writes exactly one line to /output/entry.txt.
-The output is byte-identical on every run: no randomness, no clock.
+A very literal dog explains what happened to the homework after it was
+told the assignment had to be "turned in". The program emits a single
+line into /output/entry.txt and nothing else. It stays deterministic:
+identical bytes every run, no dice rolls, no wall clock involved.
 """
 
-import os
+from pathlib import Path
 
-ENTRY = "Your homework said it needed to be 'turned in' — so I turned it in. To my stomach. It never specified where."
+EXCUSE = (
+    "Your homework said it needed to be 'turned in' — so I turned it in. "
+    "To my stomach. It never specified where."
+)
+
+DESTINATION = Path("/output/entry.txt")
 
 
-def main() -> None:
-    os.makedirs("/output", exist_ok=True)
-    with open("/output/entry.txt", "w", encoding="utf-8", newline="") as handle:
-        handle.write(ENTRY)
+def _check_line(line: str) -> None:
+    """Guard the contract: exactly one line, under the 200-char cap."""
+    assert "\n" not in line and len(line) <= 200, "entry must be one short line"
+
+
+def run() -> None:
+    _check_line(EXCUSE)
+    DESTINATION.parent.mkdir(parents=True, exist_ok=True)
+    DESTINATION.write_text(EXCUSE, encoding="utf-8", newline="")
 
 
 if __name__ == "__main__":
-    main()
+    run()
